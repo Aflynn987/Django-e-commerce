@@ -116,7 +116,12 @@ def purchase_product(request, product_id):
 
             # Poor logging practice: log sensitive user data as plain text
             logger.info(
-                f"New purchase made: {request.session['full_name']}, {request.session['email']}, {request.session['address1']}, {request.session['address2']}, {request.session['city']}, {request.session['state']}, {request.session['zip_code']}, {request.session['card_name']}, {request.session['card_number']}, {request.session['card_expiry']}, {request.session['card_cvv']}")
+                f"New purchase made: {request.session['full_name']},"
+                f" {request.session['email']}, {request.session['address1']},"
+                f" {request.session['address2']}, {request.session['city']},"
+                f" {request.session['state']}, {request.session['zip_code']},"
+                f" {request.session['card_name']}, {request.session['card_number']},"
+                f" {request.session['card_expiry']}, {request.session['card_cvv']}")
 
             return redirect('e_commerce_app:purchase_product', product_id=product_id)
     else:
