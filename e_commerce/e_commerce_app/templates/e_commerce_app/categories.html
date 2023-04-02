@@ -1,0 +1,23 @@
+{% extends "e_commerce_app/base.html" %}
+
+{% block header %}
+  <h2>categories</h2>
+{% endblock header %}
+
+{% block content %}
+
+  <ul>
+    {% for category in categories %}
+      <li>
+        <h3>
+          <a href="{% url 'e_commerce_app:category' category.id %}">{{ category }}</a>
+        </h3>
+      </li>
+    {% empty %}
+      <li>No categories have been added yet.</li>
+    {% endfor %}
+  </ul>
+
+  <h3><a href="{% url 'e_commerce_app:new_category' %}">Add a new category</a></h3>
+
+{% endblock content %}

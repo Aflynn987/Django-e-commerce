@@ -1,0 +1,14 @@
+{% extends "e_commerce_app/base.html" %}
+
+{% block content %}
+
+  <p><a href="{% url 'e_commerce_app:category' category.id %}">{{ category }}</a></p>
+
+  <p>Add a new product:</p>
+  <form action="{% url 'e_commerce_app:new_product' category.id %}" method='post'>
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button name="'submit">add product</button>
+  </form>
+
+{% endblock content %}

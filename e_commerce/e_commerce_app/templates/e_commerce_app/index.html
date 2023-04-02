@@ -1,0 +1,15 @@
+{% extends "e_commerce_app/base.html" %}
+
+{% block header %}
+    <div class="jumbotron">
+      <h1>Browse our broad selection of products.</h1>
+    </div>
+{% endblock header %}
+
+{% block content %}
+  <h3>
+    You can <a href="{% url 'users:register' %}">Register an account</a>
+    to get special rewards and save items in your cart to check later
+  </h3>
+{% endblock content %}
+

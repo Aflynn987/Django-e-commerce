@@ -1,0 +1,52 @@
+{% extends 'e_commerce_app/base.html' %}
+{% load static %}
+
+{% block header %}
+  <h2>{{ topic }}</h2>
+{% endblock header %}
+
+{% block content %}
+  <div class="row">
+    {% for product in products %}
+      <div class="col-lg-3 col-md-4 col-sm-6">
+        <div class="product-card">
+          <img class="product-image" src="{% static 'e_commerce_app/images/placeholder.jpg' %}" alt="Product Image">
+          <div class="product-body">
+            <h5 class="product-title">{{ product.heading }}</h5>
+            <p class="product-text">{{ product.text }}</p>
+            <a href="{% url 'e_commerce_app:edit_product' product.id %}" class="btn btn-primary">Edit Product</a>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="col-12">
+        <p>There are no products for this category yet.</p>
+      </div>
+    {% endfor %}
+  </div>
+{% endblock content %}
+
+{% block css %}
+  <style>
+    .product-card {
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+      padding: 10px;
+    }
+    .product-image {
+      display: block;
+      max-width: 100%;
+      height: auto;
+      margin-bottom: 10px;
+    }
+    .product-title {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+    .product-text {
+      margin-bottom: 10px;
+    }
+  </style>
+{% endblock css %}
