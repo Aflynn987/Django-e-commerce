@@ -37,7 +37,7 @@ Depending on versioning, this may be `py manage.py runserver` so check if your e
 
 With that, the server should start and display the following
 
-```yaml
+```
 Django version 4.1.7, using settings 'e_commerce.settings'
 Starting development server at http://127.0.0.1:8000/
 Quit the server with CTRL-BREAK.
@@ -49,3 +49,29 @@ http://127.0.0.1:8000/ into the web browser
 At this point you should now see the web application and are able to explore the settings there. 
 
 FYI: use http://127.0.0.1:8000/admin/ for an admin view of the app
+
+## Run application locally through HTTPS
+
+There's only one more step to running the application locally through HTTPS
+
+- Type `pip install django-sslserver` into the terminal to installthe sslserver
+
+The command to run the server is also different as you must include the cert and the key 
+
+`python manage.py runsslserver --certificate cert.pem --key key.pem`
+
+And again, you must still be in the same directory as manage.py. After that, the terminal should display the following
+
+```
+Django version 4.1.7, using settings 'e_commerce.settings'
+Starting development server at https://127.0.0.1:8000/
+Using SSL certificate: cert.pem
+Using SSL key: key.pem
+Quit the server with CTRL-BREAK.
+Enter PEM pass phrase:
+```
+
+If the server will not load and the terminal is stuck on `Enter PEM pass phrase:` the phrase is "blue_red".
+After that, you should be able to load into through the HTTPS link: https://127.0.0.1:8000/
+
+FYI: load the link with chrome

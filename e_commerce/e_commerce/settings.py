@@ -40,6 +40,7 @@ INSTALLED_APPS = [
 
     # Third party apps
     'bootstrap3',
+    'sslserver',
 
     # My apps
     'e_commerce_app',
@@ -141,3 +142,5 @@ BOOTSTRAP3 = {
 # Settings for loading images
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+
+SECURE_SSL_REDIRECT = True
