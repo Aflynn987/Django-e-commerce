@@ -16,6 +16,7 @@ class Product(models.Model):
     """The different products being sold on the store"""
     category = models.ForeignKey(Category, on_delete=models.DO_NOTHING)
     heading = models.CharField(max_length=255)
+    cost = models.DecimalField(max_digits=6, decimal_places=2)
     text = models.TextField()
     date_added = models.DateTimeField(auto_now_add=True)
     image = models.ImageField(upload_to='images/', blank=True, null=True)
