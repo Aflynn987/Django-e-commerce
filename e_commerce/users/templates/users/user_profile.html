@@ -5,13 +5,15 @@
   <div class="row">
     <div class="col-md-6">
       <h3>Personal Information</h3>
-      <p><strong>Full Name:</strong> {{ user.first_name }} {{ user.last_name }}</p>
+      <p><strong>Full Name:</strong> {{ user.full_name }}</p>
       <p><strong>Email:</strong> {{ user.email }}</p>
       <p><strong>Address Line 1:</strong> {{ user.address1 }}</p>
       <p><strong>Address Line 2:</strong> {{ user.address2 }}</p>
       <p><strong>City:</strong> {{ user.city }}</p>
       <p><strong>State:</strong> {{ user.state }}</p>
       <p><strong>Zip Code:</strong> {{ user.zip_code }}</p>
+      <p><strong>Date of Birth:</strong> {{ user.date_of_birth }}</p>
+      <p><strong>Phone Number:</strong> {{ user.phone_number }}</p>
     </div>
     <div class="col-md-6">
       <h3>Purchase History</h3>
@@ -26,4 +28,13 @@
       {% endif %}
     </div>
   </div>
+
+  <hr>
+
+  <h3>Update Personal and Credit Card Information</h3>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+  </form>
 {% endblock %}

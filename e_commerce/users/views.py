@@ -6,10 +6,11 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
 
 from e_commerce_app.models import Product
-
+from .forms import PurchaseForm
 
 # Create your views here.
 
@@ -47,5 +48,69 @@ def personal_details(request, product_id):
 @login_required
 def user_profile(request):
     user = request.user
-    context = {'user': user}
+
+    if request.method == 'POST':
+        form = PurchaseForm(request.POST, instance=user)
+        if form.is_valid():
+            # Get the form data
+            full_name = form.cleaned_data['full_name']
+            email = form.cleaned_data['email']
+            address1 = form.cleaned_data['address1']
+            address2 = form.cleaned_data['address2']
+            city = form.cleaned_data['city']
+            state = form.cleaned_data['state']
+            zip_code = form.cleaned_data['zip_code']
+            card_name = form.cleaned_data['card_name']
+            card_number = form.cleaned_data['card_number']
+            card_expiry = form.cleaned_data['card_expiry']
+            card_cvv = form.cleaned_data['card_cvv']
+
+            # Update the user object with the form data
+            user.full_name = full_name
+            user.email = email
+            user.address1 = address1
+            user.address2 = address2
+            user.city = city
+            user.state = state
+            user.zip_code = zip_code
+            user.card_name = card_name
+            user.card_number = card_number
+            user.card_expiry = card_expiry
+            user.card_cvv = card_cvv
+            user.save()
+
+            messages.success(request, 'Your purchase was successful!')
+            return redirect('users:user_profile')
+    else:
+        form = PurchaseForm(instance=user)
+
+    context = {
+        'user': user,
+        'form': form,
+    }
     return render(request, 'users/user_profile.html', context)
+
+@login_required
+def purchase_product(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    if request.method == 'POST':
+        form = PurchaseForm(request.POST)
+        if form.is_valid():
+            request.session['full_name'] = form.cleaned_data['full_name']
+            request.session['email'] = form.cleaned_data['email']
+            request.session['address1'] = form.cleaned_data['address1']
+            request.session['address2'] = form.cleaned_data['address2']
+            request.session['city'] = form.cleaned_data['city']
+            request.session['state'] = form.cleaned_data['state']
+            request.session['zip_code'] = form.cleaned_data['zip_code']
+            request.session['card_name'] = form.cleaned_data['card_name']
+            request.session['card_number'] = form.cleaned_data['card_number']
+            request.session['card_expiry'] = form.cleaned_data['card_expiry']
+            request.session['card_cvv'] = form.cleaned_data['card_cvv']
+            request.save()
+            return redirect('e_commerce_app:purchase_product', product_id=product_id)
+    else:
+        form = PurchaseForm()
+
+    return render(request, 'e_commerce_app/purchase_product.html', {'form': form, 'product': product})
+
