@@ -26,8 +26,6 @@ def category(request, category_id):
     """Show a single category and the necessary information"""
     category = Category.objects.get(id=category_id)
     # Make sure the topic belongs to the current user. (can remove this aspect)
-    if category.owner != request.user:
-        raise Http404
 
     products = category.product_set.order_by('-date_added')
     context = {'category': category, 'products': products}
@@ -104,8 +102,6 @@ def product(request, product_id):
     """Show a single product"""
     product = Product.objects.get(id=product_id)
     category = product.category
-    if category.owner != request.user:
-        raise Http404
     form = ProductForm(instance=product)
 
     context = {'product': product, 'category': category, 'form': form}
