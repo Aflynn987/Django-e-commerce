@@ -48,8 +48,9 @@ def new_category(request):
     return render(request, 'e_commerce_app/new_category.html', context)
 
 
+
 def new_product(request, category_id):
-    """Add a new entry for a particular topic."""
+    """Add a new product for a particular category."""
     category = Category.objects.get(id=category_id)
 
     if request.method != 'POST':
@@ -59,16 +60,20 @@ def new_product(request, category_id):
         # POST data submitted; process data.
         form = ProductForm(data=request.POST)
         if form.is_valid():
-            new_product = form.save(commit=False)
-            new_product.category = category
-            new_product.save()
+            name = form.cleaned_data['name']
+            description = form.cleaned_data['description']
+            price = form.cleaned_data['price']
+            image = form.cleaned_data['image']
+            cursor = connection.cursor()
+            cursor.execute("INSERT INTO e_commerce_app_product (name, category_id, description, price, image) VALUES (%s, %s, %s, %s, %s)",
+                [name, category_id, description, price, image])
             return HttpResponseRedirect(reverse('e_commerce_app:category', args=[category_id]))
 
     context = {'category': category, 'form': form}
     return render(request, 'e_commerce_app/new_product.html', context)
 
 def edit_product(request, product_id):
-    """Edit an existing entry."""
+    """Edit an existing product."""
     cursor = connection.cursor()
     cursor.execute("SELECT * FROM e_commerce_app_product WHERE id = %s", [product_id])
     row = cursor.fetchone()
