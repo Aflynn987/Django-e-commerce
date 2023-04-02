@@ -4,6 +4,7 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.views.generic.detail import DetailView
+from django.db import connection
 
 from .models import Category, Product
 from .forms import CategoryForm, ProductForm
@@ -68,24 +69,25 @@ def new_product(request, category_id):
 
 def edit_product(request, product_id):
     """Edit an existing entry."""
-    product = Product.objects.get(id=product_id)
-    category = product.category
-    if category.owner != request.user:
-        raise Http404
+    cursor = connection.cursor()
+    cursor.execute("SELECT * FROM e_commerce_app_product WHERE id = %s", [product_id])
+    row = cursor.fetchone()
+
+    cursor.execute("SELECT * FROM e_commerce_app_category WHERE id = %s", [row[2]])
+    category_row = cursor.fetchone()
 
     if request.method != 'POST':
         # Initial request; pre-fill form with the current entry
-        form = ProductForm(instance=product)
+        form = ProductForm(initial={'name': row[1], 'description': row[3], 'price': row[4], 'image': row[5]})
     else:
         # POST data submitted; process data.
-        form = ProductForm(instance=product, data=request.POST)
+        form = ProductForm(data=request.POST)
         if form.is_valid():
-            new_product = form.save(commit=False)
-            new_product.category = category
-            new_product.save()
-            return HttpResponseRedirect(reverse('e_commerce_app:category', args=[category.id]))
+            cursor.execute("UPDATE e_commerce_app_product SET name=%s, description=%s, price=%s, image=%s WHERE id=%s",
+                [form.cleaned_data['name'], form.cleaned_data['description'], form.cleaned_data['price'], form.cleaned_data['image'], product_id])
+            return HttpResponseRedirect(reverse('e_commerce_app:category', args=[category_row[0]]))
 
-    context = {'product': product, 'category': category, 'form': form}
+    context = {'product': {'id': row[0], 'category': row[2]}, 'category': {'id': category_row[0], 'owner': category_row[1]}, 'form': form}
     return render(request, 'e_commerce_app/edit_product.html', context)
 
 class ProductDetailView(DetailView):
