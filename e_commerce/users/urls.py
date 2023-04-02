@@ -20,4 +20,7 @@ urlpatterns = [
 
     # Personal details page for payment
     re_path('^personal_details/(?P<product_id>\d+)/$', views.personal_details, name='personal_details'),
+
+    # User Profile page
+    re_path('profile/', views.user_profile, name='user_profile'),
 ]

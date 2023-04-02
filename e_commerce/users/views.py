@@ -43,3 +43,9 @@ def personal_details(request, product_id):
     product = Product.objects.get(id=product_id)
     context = {'product': product, 'product_id': product_id}
     return render(request, 'users/personal_details.html', context)
+
+@login_required
+def user_profile(request):
+    user = request.user
+    context = {'user': user}
+    return render(request, 'users/user_profile.html', context)
