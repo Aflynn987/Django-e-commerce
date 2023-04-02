@@ -14,14 +14,12 @@ def index(request):
     """The home page for the e-commerce-app"""
     return render(request, 'e_commerce_app/index.html')
 
-@login_required
 def categories(request):
     """Show all categories"""
     categories = Category.objects.order_by('date_added')
     context = {'categories': categories}
     return render(request, 'e_commerce_app/categories.html', context)
 
-@login_required
 def category(request, category_id):
     """Show a single category and the necessary information"""
     category = Category.objects.get(id=category_id)
@@ -31,7 +29,6 @@ def category(request, category_id):
     context = {'category': category, 'products': products}
     return render(request, 'e_commerce_app/category.html', context)
 
-@login_required
 def new_category(request):
     """Add a new category"""
     if request.method != 'POST':
@@ -49,7 +46,7 @@ def new_category(request):
     context = {'form': form}
     return render(request, 'e_commerce_app/new_category.html', context)
 
-@login_required
+
 def new_product(request, category_id):
     """Add a new entry for a particular topic."""
     category = Category.objects.get(id=category_id)
@@ -69,8 +66,6 @@ def new_product(request, category_id):
     context = {'category': category, 'form': form}
     return render(request, 'e_commerce_app/new_product.html', context)
 
-@login_required
-@user_passes_test(lambda user: user.is_staff)
 def edit_product(request, product_id):
     """Edit an existing entry."""
     product = Product.objects.get(id=product_id)
@@ -97,7 +92,6 @@ class ProductDetailView(DetailView):
     model = Product
     template_name = 'e_commerce_app/product.html'
     context_object_name = 'product'
-@login_required
 def product(request, product_id):
     """Show a single product"""
     product = Product.objects.get(id=product_id)
@@ -106,7 +100,6 @@ def product(request, product_id):
 
     context = {'product': product, 'category': category, 'form': form}
     return render(request, 'e_commerce_app/product.html', context)
-@login_required
 def purchase_product(request, product_id):
     """View for purchasing a product"""
     product = Product.objects.get(id=product_id)
