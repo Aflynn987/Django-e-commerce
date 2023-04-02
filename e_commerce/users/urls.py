@@ -17,4 +17,7 @@ urlpatterns = [
 
     # Registration page
     re_path('^register/$', views.register, name='register'),
+
+    # Personal details page for payment
+    re_path('^personal_details/(?P<product_id>\d+)/$', views.personal_details, name='personal_details'),
 ]

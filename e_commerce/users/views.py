@@ -3,10 +3,13 @@ from django.http import HttpResponseRedirect
 from django.contrib.auth import logout, login, authenticate
 from django.contrib.auth.forms import UserCreationForm
 
-from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.shortcuts import render
+
+from e_commerce_app.models import Product
+
 
 # Create your views here.
 
@@ -34,3 +37,9 @@ def register(request):
 
     context = {'form': form}
     return render(request, 'users/register.html', context)
+
+@login_required
+def personal_details(request, product_id):
+    product = Product.objects.get(id=product_id)
+    context = {'product': product, 'product_id': product_id}
+    return render(request, 'users/personal_details.html', context)

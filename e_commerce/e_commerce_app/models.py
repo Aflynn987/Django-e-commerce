@@ -15,9 +15,11 @@ class Category(models.Model):
 class Product(models.Model):
     """The different products being sold on the store"""
     category = models.ForeignKey(Category, on_delete=models.DO_NOTHING)
+    heading = models.CharField(max_length=255)
     text = models.TextField()
     date_added = models.DateTimeField(auto_now_add=True)
-    image = models.ImageField(upload_to='images/')
+    image = models.ImageField(upload_to='images/', blank=True, null=True)
+    is_admin_editable = models.BooleanField(default=True)
 
     class Meta:
         verbose_name_plural = 'products'

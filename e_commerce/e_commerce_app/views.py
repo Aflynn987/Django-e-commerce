@@ -1,7 +1,9 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, Http404
 from django.urls import reverse
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib import messages
+from django.views.generic.detail import DetailView
 
 from .models import Category, Product
 from .forms import CategoryForm, ProductForm
@@ -70,6 +72,7 @@ def new_product(request, category_id):
     return render(request, 'e_commerce_app/new_product.html', context)
 
 @login_required
+@user_passes_test(lambda user: user.is_staff)
 def edit_product(request, product_id):
     """Edit an existing entry."""
     product = Product.objects.get(id=product_id)
@@ -91,3 +94,34 @@ def edit_product(request, product_id):
 
     context = {'product': product, 'category': category, 'form': form}
     return render(request, 'e_commerce_app/edit_product.html', context)
+
+class ProductDetailView(DetailView):
+    model = Product
+    template_name = 'e_commerce_app/product.html'
+    context_object_name = 'product'
+@login_required
+def product(request, product_id):
+    """Show a single product"""
+    product = Product.objects.get(id=product_id)
+    category = product.category
+    if category.owner != request.user:
+        raise Http404
+    form = ProductForm(instance=product)
+
+    context = {'product': product, 'category': category, 'form': form}
+    return render(request, 'e_commerce_app/product.html', context)
+@login_required
+def purchase_product(request, product_id):
+    """View for purchasing a product"""
+    product = Product.objects.get(id=product_id)
+
+    # if request.method == 'POST':
+    #     # Process the purchase form data
+    #     # Given more time, there would be sample payment processing detail here
+    #     messages.success(request, f"Thank you for purchasing {product.heading}!")
+    #     return HttpResponseRedirect(reverse('e_commerce_app:category_products', args=[product.category.id]))
+
+    # Render the purchase page with the product information
+    context = {'product': product}
+    return render(request, 'e_commerce_app/purchase_product.html', context)
+

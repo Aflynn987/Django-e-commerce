@@ -26,4 +26,11 @@ urlpatterns = [
 
     # Page for editing a product
     re_path('^edit_product/(?P<product_id>\d+)/$', views.edit_product, name='edit_product'),
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+    # Page for viewing a product
+    re_path('^product/(?P<product_id>\d+)/$', views.product, name='product'),
+
+    # Page for purchasing a product
+    re_path('^purchase/(?P<product_id>\d+)/$', views.purchase_product, name='purchase_product'),
+
+    ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
