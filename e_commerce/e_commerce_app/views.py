@@ -14,13 +14,13 @@ from .forms import CategoryForm, ProductForm
 def index(request):
     """The home page for the e-commerce-app"""
     return render(request, 'e_commerce_app/index.html')
-
+@login_required
 def categories(request):
     """Show all categories"""
     categories = Category.objects.order_by('date_added')
     context = {'categories': categories}
     return render(request, 'e_commerce_app/categories.html', context)
-
+@login_required
 def category(request, category_id):
     """Show a single category and the necessary information"""
     category = Category.objects.get(id=category_id)
@@ -29,7 +29,7 @@ def category(request, category_id):
     products = category.product_set.order_by('-date_added')
     context = {'category': category, 'products': products}
     return render(request, 'e_commerce_app/category.html', context)
-
+@login_required
 def new_category(request):
     """Add a new category"""
     if request.method != 'POST':
@@ -48,9 +48,9 @@ def new_category(request):
     return render(request, 'e_commerce_app/new_category.html', context)
 
 
-
+@login_required
 def new_product(request, category_id):
-    """Add a new product for a particular category."""
+    """Add a new entry for a particular topic."""
     category = Category.objects.get(id=category_id)
 
     if request.method != 'POST':
@@ -60,45 +60,41 @@ def new_product(request, category_id):
         # POST data submitted; process data.
         form = ProductForm(data=request.POST)
         if form.is_valid():
-            name = form.cleaned_data['name']
-            description = form.cleaned_data['description']
-            price = form.cleaned_data['price']
-            image = form.cleaned_data['image']
-            cursor = connection.cursor()
-            cursor.execute("INSERT INTO e_commerce_app_product (name, category_id, description, price, image) VALUES (%s, %s, %s, %s, %s)",
-                [name, category_id, description, price, image])
+            new_product = form.save(commit=False)
+            new_product.category = category
+            new_product.save()
             return HttpResponseRedirect(reverse('e_commerce_app:category', args=[category_id]))
 
     context = {'category': category, 'form': form}
     return render(request, 'e_commerce_app/new_product.html', context)
-
+@login_required
 def edit_product(request, product_id):
     """Edit an existing product."""
-    cursor = connection.cursor()
-    cursor.execute("SELECT * FROM e_commerce_app_product WHERE id = %s", [product_id])
-    row = cursor.fetchone()
-
-    cursor.execute("SELECT * FROM e_commerce_app_category WHERE id = %s", [row[2]])
-    category_row = cursor.fetchone()
+    product = Product.objects.get(id=product_id)
+    category = product.category
+    if category.owner != request.user:
+        raise Http404
 
     if request.method != 'POST':
         # Initial request; pre-fill form with the current entry
-        form = ProductForm(initial={'name': row[1], 'description': row[3], 'price': row[4], 'image': row[5]})
+        form = ProductForm(instance=product)
     else:
         # POST data submitted; process data.
-        form = ProductForm(data=request.POST)
+        form = ProductForm(instance=product, data=request.POST)
         if form.is_valid():
-            cursor.execute("UPDATE e_commerce_app_product SET name=%s, description=%s, price=%s, image=%s WHERE id=%s",
-                [form.cleaned_data['name'], form.cleaned_data['description'], form.cleaned_data['price'], form.cleaned_data['image'], product_id])
-            return HttpResponseRedirect(reverse('e_commerce_app:category', args=[category_row[0]]))
+            new_product = form.save(commit=False)
+            new_product.category = category
+            new_product.save()
+            return HttpResponseRedirect(reverse('e_commerce_app:category', args=[category.id]))
 
-    context = {'product': {'id': row[0], 'category': row[2]}, 'category': {'id': category_row[0], 'owner': category_row[1]}, 'form': form}
+    context = {'product': product, 'category': category, 'form': form}
     return render(request, 'e_commerce_app/edit_product.html', context)
-
+@login_required
 class ProductDetailView(DetailView):
     model = Product
     template_name = 'e_commerce_app/product.html'
     context_object_name = 'product'
+@login_required
 def product(request, product_id):
     """Show a single product"""
     product = Product.objects.get(id=product_id)
@@ -107,6 +103,7 @@ def product(request, product_id):
 
     context = {'product': product, 'category': category, 'form': form}
     return render(request, 'e_commerce_app/product.html', context)
+@login_required
 def purchase_product(request, product_id):
     """View for purchasing a product"""
     product = Product.objects.get(id=product_id)
