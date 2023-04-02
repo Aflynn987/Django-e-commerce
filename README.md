@@ -1,4 +1,4 @@
-# Django-e-commerce - Main 
+# Django-e-commerce - Insecure 
 
 ## Run application locally
 
